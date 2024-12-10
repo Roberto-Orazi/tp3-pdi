@@ -1,4 +1,3 @@
-# Defininimos función para mostrar imágenes
 import matplotlib
 
 matplotlib.use("TkAgg")
@@ -62,10 +61,10 @@ def imreconstruct(marker, mask, kernel=None):
 
 def imfillhole(img):
     # img: Imagen binaria de entrada. Valores permitidos: 0 (False), 255 (True).
-    mask = np.zeros_like(img)  # Genero mascara para...
+    mask = np.zeros_like(img)
     mask = cv2.copyMakeBorder(
         mask[1:-1, 1:-1], 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=int(255)
-    )  # ... seleccionar los bordes.
+    )
     marker = cv2.bitwise_not(
         img, mask=mask
     )  # El marcador lo defino como el complemento de los bordes.
@@ -97,9 +96,9 @@ def se_mueve_no_se_mueve(foto, centroides):
     ant_cen = anterior[1]
     act_cen = actual[1]
     for j in range(len(ant_cen)):
-        if (act_cen[j][1][0] - 20.0) < ant_cen[j][1][0] < (
-            act_cen[j][1][0] + 20.0
-        ) and (act_cen[j][1][1] - 20.0) < ant_cen[j][1][1] < (act_cen[j][1][1] + 20.0):
+        if (act_cen[j][1][0] - 40.0) < ant_cen[j][1][0] < (
+            act_cen[j][1][0] + 40.0
+        ) and (act_cen[j][1][1] - 40.0) < ant_cen[j][1][1] < (act_cen[j][1][1] + 40.0):
             lista.append(act_cen[j][0])
     return lista
 
@@ -210,11 +209,32 @@ def procesar_imagenes(num_foto, frame, num_foto_centroides_dados=[]):
                         cv2.rectangle(
                             img_rgb, punto1, punto2, color=(0, 0, 255), thickness=5
                         )
+                        # Coordenadas iniciales para el texto
+                        text_x = x3 - 10
+                        text_y = y3 - 10
+
+                        # Asegurarse de que el texto no salga de los límites de la imagen
+                        if text_x < 0:
+                            text_x = (
+                                x3 + 10
+                            )  # Mueve el texto hacia la derecha si está muy cerca del borde izquierdo
+                        if text_y < 0:
+                            text_y = (
+                                y3 + 30
+                            )  # Mueve el texto hacia abajo si está muy cerca del borde superior
+                        if text_x + 200 > img_rgb.shape[1]:
+                            text_x = (
+                                x3 - 150
+                            )  # Mueve el texto hacia la izquierda si está cerca del borde derecho
+                        if text_y + 30 > img_rgb.shape[0]:
+                            text_y = (
+                                y3 - 30
+                            )  # Mueve el texto hacia arriba si está cerca del borde inferior
                         # Añadir la etiqueta (texto)
                         cv2.putText(
                             img_rgb,
                             f"Valor es: {g[1]}",
-                            (x3 - 10, y3 - 10),
+                            (text_x, text_y),
                             cv2.FONT_HERSHEY_SIMPLEX,
                             fontScale=1,
                             color=(0, 255, 0),
